@@ -21,6 +21,14 @@ server.get('/newgame', (req,res)=>{
     res.status(201)
     res.send({sessionID: newID})
 })
+server.get('/gamestate', (req,res)=>){
+    const sessionID = req.query.sessionID;
+
+    if (sessionID === 'undefined'){
+        
+    }
+    res.status
+}
 
 // server.get('/gamestate', (req,res)=>{
 //     let sessionID = req.query.sessionID;
