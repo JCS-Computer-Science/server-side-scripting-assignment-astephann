@@ -35,7 +35,20 @@ describe('Wordle Server', () => {
 
         test('returns a status code 200', () => expect(gameStateRes.status).toBe(200))
         describe('game state object is accurate', () => {
-            test('guesses is an empty array', () => expect(gameState.guesses.length).toBe(0))
+server.get('/newgame', (req, res) => {
+    let newID = uuid.v4();
+    let newGame = {
+        wordToGuess: "apple",  // This can be customized or randomized
+        guesses: [],           // Empty array for guesses
+        wrongLetters: [],      // Empty array for wrong letters
+        closeLetters: [],      // Empty array for close letters
+        rightLetters: [],      // Empty array for right letters
+        remainingGuesses: 6,   // Starting remaining guesses
+        gameOver: false        // Game is not over initially
+    };
+    activeSessions[newID] = newGame; // Store the game in active sessions
+    res.status(201).send({ sessionID: newID }); // Respond with session ID
+});            test('guesses is an empty array', () => expect(gameState.guesses.length).toBe(0))
             test('remainingGuesses is 6', () => expect(gameState.remainingGuesses).toBe(6))
             test('wrongLetters is an empty array', () => expect(gameState.wrongLetters).toEqual([]))
             test('closeLetters is an empty array', () => expect(gameState.closeLetters).toEqual([]))
