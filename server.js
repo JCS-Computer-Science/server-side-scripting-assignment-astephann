@@ -9,30 +9,16 @@ let activeSessions={}
 
 server.get('/newgame', (req,res)=>{
     let newID = uuid.v4();
-    let answer = (req.query.answer || "hello").toLowerCase();  
+    let answer = (req.query.answer || "apple").toLowerCase();  
     let newGame ={
         wordToGuess: answer,
         guesses:[],
         wrongLetters:[],
-        
         closeLetters:[],
         rightLetters:[],
         remainingGuesses:6,
         gameOver: false
     };
-
-  let guess = (req.query.guess || null)?.toLowerCase();
-
-    if (guess === answer){
-        newGame.gameOver = true;
-    } else if (guess){
-        newGame.guesses.push(guess);
-        newGame.remainingGuesses -= 1;
-        
-        if(newGame.remainingGuesses === 0){
-            newGame.gameOver = true;
-        }
-    }
 
     activeSessions[newID] = newGame;
     res.status(201);
@@ -49,11 +35,30 @@ server.get('/gamestate', (req,res) => {
 server.post('/guess'), (req,res)=>{
     let sessionID = req.body.sessionID;
     let guess = req.body.guess;
+    let gameState = activeSession[sessionID];
 
-    if (sessionID || guess){
-        res.status(404)
-        res.send({error: "Session ID/guess are required"})
+    if (!sessionID || !guess){
+        res.status(404);
+        res.send({error: "Session ID/guess are required"});
     }
+
+    if (guess.length !== 5){
+        res.status(400);
+        res.send({error: "guess must be 5 characters"});
+    }
+    
+    if (!gameState){
+        res.status(404);
+        res.send({error:"Session not found"});
+    }
+
+    if(gameState.gameOver === true){
+        res.status(400);
+        res.send({error: "Game is over"});
+    }
+
+
+
     
     res.status(201);
 }
