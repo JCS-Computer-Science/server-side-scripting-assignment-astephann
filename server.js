@@ -34,28 +34,11 @@ server.get('/gamestate', (req,res) => {
 
 server.post('/guess'), (req,res)=>{
     let sessionID = req.body.sessionID;
-    let guess = req.body.guess;
+    let guess = (req.body.guess || null).toLowerCase();
     let gameState = activeSession[sessionID];
 
-    if (!sessionID || !guess){
-        res.status(404);
-        res.send({error: "Session ID/guess are required"});
-    }
-
-    if (guess.length !== 5){
-        res.status(400);
-        res.send({error: "guess must be 5 characters"});
-    }
-    
-    if (!gameState){
-        res.status(404);
-        res.send({error:"Session not found"});
-    }
-
-    if(gameState.gameOver === true){
-        res.status(400);
-        res.send({error: "Game is over"});
-    }
+    gameState.guesses.push(guess);
+    gameState.remainingGuesses -= 1;
 
 
 
