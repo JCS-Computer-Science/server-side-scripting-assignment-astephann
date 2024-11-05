@@ -32,19 +32,51 @@ server.get('/gamestate', (req,res) => {
     res.status(200);
 });
 
-server.post('/guess'), (req,res)=>{
+server.post('/guess', (req, res) => {
     let sessionID = req.body.sessionID;
-    let guess = (req.body.guess || null).toLowerCase();
-    let gameState = activeSession[sessionID];
+    let guess = (req.body.guess || "").toLowerCase();
+    let gameState = activeSessions[sessionID];
+    let answer = gameState.wordToGuess;
+    let wrongLetters = [];
+    let closeLetters = [];
+    let rightLetters = [];
 
     gameState.guesses.push(guess);
     gameState.remainingGuesses -= 1;
 
+    for (let i = 0; i < guess.length; i++) {
+        let letter = guess[i];
+        if (letter === answer[i]) {
+            rightLetters.push(letter);
+        } else {
+            let isClose = false;
+            for (let index = 0; index < answer.length; index++) {
+                if (letter === answer[index]) {
+                    isClose = true;
+                    break;
+                }
+            }
+            if (isClose) {
+                closeLetters.push(letter);
+            } else {
+                wrongLetters.push(letter);
+            }
+        }
+    }
 
+    gameState.wrongLetters = wrongLetters;
+    gameState.closeLetters = closeLetters;
+    gameState.rightLetters = rightLetters;
 
+    let response = {gameState};
     
-    res.status(201);
-}
+    if (gameState.gameOver) {
+        response.wordToGuess = answer;
+    }
+
+    res.status(201)
+    res.send(response);
+});
 
 //Do not remove this line. This allows the test suite to start
 //multiple instances of your server on different ports
