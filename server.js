@@ -36,6 +36,24 @@ server.post('/guess', (req, res) => {
     let sessionID = req.body.sessionID;
     let guess = (req.body.guess || "").toLowerCase();
     let gameState = activeSessions[sessionID];
+
+        if (!sessionID) {
+            res.status(400).send({ error: "Session ID is required" });
+            return;
+        }
+        if (!gameState) {
+            res.status(404).send({ error: "Session not found" });
+            return;
+        }
+        if (guess.length !== 5) {
+            res.status(400).send({ error: "Guess must be exactly 5 characters long" });
+            return;
+        }
+        if (gameState.gameOver) {
+            res.status(400).send({ error: "Game is already over" });
+            return;
+        }
+
     let answer = gameState.wordToGuess;
     let guessResult = [];
 
@@ -45,37 +63,40 @@ server.post('/guess', (req, res) => {
 
         if (letter === answer[i]) {
             result = 'RIGHT';
-            if (!gamestate.rightLetters.includes(letter)) {
-                gameState.rightLetters.push(letter);  
-            }      
+
+            if (!gameState.rightLetters.includes(letter)) {
+                gameState.rightLetters.push(letter);
+            }
         } else if (answer.includes(letter)) {
             result = 'CLOSE';
-            if (!gameState.closeLetters.includes(letter) && !gamestate.rightLetter.includes(letter)){
+
+            if (!gameState.closeLetters.includes(letter) && !gameState.rightLetters.includes(letter)) {
                 gameState.closeLetters.push(letter);
             }
         } else {
             result = 'WRONG';
-            if (!gameState.wrongLetters.includes(letter)){
-                gameState.wrongLetters.push(letter)
+
+            if (!gameState.wrongLetters.includes(letter)) {
+                gameState.wrongLetters.push(letter);
             }
         }
-            guessResult.push({value: letter, result});  
-    }   
-
+        guessResult.push({ value: letter, result });
+    }
     gameState.guesses.push(guessResult);
 
     gameState.remainingGuesses -= 1;
-    gameState.gameOver = gameState.remainingGuesses <= 0 || guessResult.every(item => item.result === 'RIGHT');
+    gameState.gameOver = gameState.remainingGuesses <= 0 ||
+                         guessResult.every(item => item.result === 'RIGHT');
 
-    let response = {gameState};
-    
+    let response = { gameState };
+
     if (gameState.gameOver) {
         response.wordToGuess = answer;
     }
 
-    res.status(201)
-    res.send(response);
+    res.status(201).send(response);
 });
+
 
 //Do not remove this line. This allows the test suite to start
 //multiple instances of your server on different ports
