@@ -67,10 +67,11 @@ server.post('/guess', (req, res) => {
             if (!gameState.rightLetters.includes(letter)) {
                 gameState.rightLetters.push(letter);
             }
+            gameState.closeLetters = gameState.closeLetters.filter((l) => l !== letter);
         } else if (answer.includes(letter)) {
             result = 'CLOSE';
 
-            if (!gameState.closeLetters.includes(letter) && !gameState.rightLetters.includes(letter)) {
+            if (!gameState.rightLetters.includes(letter) && !gameState.closeLetters.includes(letter)) {
                 gameState.closeLetters.push(letter);
             }
         } else {
