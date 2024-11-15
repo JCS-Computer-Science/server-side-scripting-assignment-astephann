@@ -38,19 +38,23 @@ server.post('/guess', (req, res) => {
     let gameState = activeSessions[sessionID];
 
         if (!sessionID) {
-            res.status(400).send({ error: "Session ID is required" });
+            res.status(400);
+            res.send({ error: "Session ID is required" });
             return;
         }
         if (!gameState) {
-            res.status(404).send({ error: "Session not found" });
+            res.status(404);
+            res.send({ error: "Session not found" });
             return;
         }
         if (guess.length !== 5) {
-            res.status(400).send({ error: "Guess must be exactly 5 characters long" });
+            res.status(400);
+            res.send({ error: "Guess must be exactly 5 characters long" });
             return;
         }
         if (gameState.gameOver) {
-            res.status(400).send({ error: "Game is already over" });
+            res.status(400);
+            res.send({ error: "Game is already over" });
             return;
         }
 
@@ -95,10 +99,13 @@ server.post('/guess', (req, res) => {
         response.wordToGuess = answer;
     }
 
-    res.status(201).send(response);
+    res.status(201)
+    res.send(response);
 });
+
 
 
 //Do not remove this line. This allows the test suite to start
 //multiple instances of your server on different ports
 module.exports = server;
+
